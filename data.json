@@ -1,0 +1,32 @@
+{
+	"Users": [
+		{
+			"id": "59dde0de06024380d2fe4f86",
+			"age": "4",
+			"name": "Jörg",
+			"gender": "male",
+			"email": "billielamb@zedalis.com"
+		},
+		{
+			"id": "59dde0de47b61d96286c4f18",
+			"age": "44",
+			"name": "Karla",
+			"gender": "male",
+			"email": "ja@gmail.com"
+		},
+		{
+			"id": "C4F7B-H",
+			"age": "55",
+			"name": "Paul",
+			"email": "steve@gmail.com",
+			"gender": "male"
+		},
+		{
+			"id": "4d9e9964-70c3-4968-9e25-a0d25f55d109",
+			"name": "Nicolai Petersen",
+			"email": "nicolai@gmail.com",
+			"age": "18",
+			"gender": "male"
+		}
+	]
+}
