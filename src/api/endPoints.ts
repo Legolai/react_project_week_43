@@ -1,10 +1,13 @@
-import User from "../@types/user";
+import User from "../@types/entities/user";
+import MediaType from "../@types/requestTypes/mediaType";
+import Method from "../@types/requestTypes/method";
+import RequestType from "../@types/requestTypes/requestType";
 
-const BASE_URL = "http://localhost:3000";
+const BASE_URL = "http://localhost:5000";
 
-const api = async <T>(url: string, method: string, body?: T, headers?: {}) => {
+const api = async <T>({ url, method, header, body }: RequestType<T>) => {
 	return fetch(url, {
-		headers: headers,
+		headers: header,
 		method: method,
 		body: JSON.stringify(body)
 	}).then(response => {
@@ -12,15 +15,26 @@ const api = async <T>(url: string, method: string, body?: T, headers?: {}) => {
 			throw new Error(response.statusText);
 		}
 		return response.json() as Promise<T>;
-	}).catch(err => { console.error(err); return undefined; });
+	}).catch(_ => undefined);
 };
 
-const findAllUsers = async () => {
-	return api<User[]>(`${BASE_URL}/users`, "GET");
+const UserApi = {
+	findAll: async () => {
+		return api<User[]>({
+			url: `${BASE_URL}/users`, method: Method.GET, header: {
+				"Accept": MediaType.application_json
+			}
+		});
+	},
+	create: async (newUser: User) => {
+		return api<User>({
+			url: `${BASE_URL}/users`, method: Method.POST, header: {
+				"Content-Type": MediaType.application_json,
+				"accept": MediaType.application_json
+			}, body: newUser
+		});
+	},
 };
 
-const createNewUser = async (newUser: User) => {
-	return api<User>(`${BASE_URL}/users`, "POST", newUser, { "Content-Type": "application/json" });
-};
 
-export { findAllUsers, createNewUser };
+export { UserApi };

@@ -1,84 +1,82 @@
 import InputField from "./InputField";
 import Button from "./Button";
-import { FormEvent, useState } from "react";
-import { createNewUser } from "../api/endPoints";
-import User, { genders } from "../@types/user";
+import { ChangeEvent, FormEvent, useState } from "react";
+import { UserApi } from "../api/endPoints";
+import User, { emptyUser, isOfTypeGender } from "../@types/entities/user";
 
 const UserForm = () => {
-	const [fname, setFname] = useState("");
-	const [lname, setLname] = useState("");
-	const [email, setEmail] = useState("");
-	const [age, setAge] = useState(0);
-	const [gender, setGender] = useState("");
+	const [form, setForm] = useState<Omit<User, "id">>(emptyUser);
+
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+		setForm(curr => {
+			return { ...curr, [e.target.name]: e.target.value };
+		});
+	};
 
 	const onReset = () => {
-		setFname("");
-		setLname("");
-		setEmail("");
-		setAge(0);
-		setGender("");
+		setForm(emptyUser);
 	};
 
 	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		const user: User = {
 			id: crypto.randomUUID(),
-			name: `${fname} ${lname}`,
-			email,
-			age,
-			gender: gender as keyof typeof genders,
+			...form,
 		};
-		onReset();
-		createNewUser(user);
+
+		UserApi.create(user).then(_ => onReset());
 	};
 
 	return (
 		<form onSubmit={onSubmit}>
 			<div className="flex gap-5">
 				<InputField
-					value={fname}
-					onChange={e => setFname(e.target.value)}
-					label="First name"
-					name="fname"
+					value={form.name}
+					onChange={onChange}
+					label="Name"
+					name="name"
 					type="text"
 					required
 				/>
 				<InputField
-					value={lname}
-					onChange={e => setLname(e.target.value)}
-					label="Last name"
-					name="lname"
-					type="text"
-					required
-				/>
-			</div>
-			<div className="flex gap-5">
-				<InputField
-					value={age}
-					min={0}
-					onChange={e => {
-						const value = e.target.value;
-						if (Number.parseInt(value)) setAge(value as unknown as number);
-					}}
-					label="Age"
-					name="age"
-					type="number"
-					required
-				/>
-				<InputField
-					value={email}
-					onChange={e => setEmail(e.target.value)}
+					value={form.email}
+					onChange={onChange}
 					label="Email"
 					name="email"
 					type="email"
 					required
 				/>
+			</div>
+			<div className="flex gap-5">
 				<InputField
-					value={gender}
-					onChange={e => setGender(e.target.value)}
+					value={form.age}
+					min={0}
+					onChange={e => {
+						const value = e.target.value;
+						if (Number.parseInt(value) || value.length == 0) {
+							onChange(e);
+						} else {
+							e.target.value = "0";
+							onChange(e);
+						}
+					}}
 					onBlur={e => {
-						if (!(typeof e.target.value in genders))
-							setGender(genders["not specified"].toString());
+						e.target.value = e.target.value.length == 0 ? "0" : form.age.toString();
+						onChange(e);
+					}}
+					label="Age"
+					name="age"
+					type="text"
+					required
+				/>
+				<InputField
+					value={form.gender}
+					onChange={e => onChange(e)}
+					onBlur={e => {
+						if (!isOfTypeGender(e.target.value)) {
+							e.target.value = "not specified";
+							onChange(e);
+						}
 					}}
 					label="Gender"
 					name="gender"

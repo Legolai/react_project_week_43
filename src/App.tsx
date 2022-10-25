@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import User from "./@types/user";
-import { findAllUsers } from "./api/endPoints";
+import User from "./@types/entities/user";
+import { UserApi } from "./api/endPoints";
 import "./App.css";
 import UserForm from "./components/UserForm";
 
@@ -9,7 +9,7 @@ function App() {
 
 	useEffect(() => {
 		const mount = async () => {
-			const newUsers = await findAllUsers();
+			const newUsers = await UserApi.findAll();
 			if (newUsers) setUsers(newUsers);
 		};
 		mount();
