@@ -12,19 +12,24 @@ const UserForm = () => {
 			return { ...curr, [e.target.name]: e.target.value };
 		});
 	};
-
 	const onReset = () => {
 		setForm(emptyUser);
 	};
 
-	const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
+	const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
 		const user: User = {
 			id: crypto.randomUUID(),
 			...form,
 		};
-
-		UserApi.create(user).then(_ => onReset());
+		const checkEmailDupes = await UserApi.findUserWith("email", user.email);
+		console.log(checkEmailDupes)
+		if (checkEmailDupes !== undefined && checkEmailDupes.length === 0) {
+			UserApi.create(user).then(_ => onReset());
+		} else {
+			alert("Email in use");
+			onReset();
+		}
 	};
 
 	return (
