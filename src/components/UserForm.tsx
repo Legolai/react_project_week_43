@@ -2,7 +2,8 @@ import InputField from "./InputField";
 import Button from "./Button";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { UserApi } from "../api/endPoints";
-import User, { emptyUser, isOfTypeGender } from "../@types/entities/user";
+import User, { emptyUser, genders, isOfTypeGender } from "../@types/entities/user";
+import Selector from "./Selector";
 
 const UserForm = () => {
 	const [form, setForm] = useState<Omit<User, "id">>(emptyUser);
@@ -69,6 +70,14 @@ const UserForm = () => {
 					type="text"
 					required
 				/>
+
+				<Selector
+					options={genders.map(g => {
+						return { text: g, value: g };
+					})}
+					placeholder="Select a gender"
+					option={o => <div data-value={o.value}>{o.text}</div>}
+				/>
 				<InputField
 					value={form.gender}
 					onChange={e => onChange(e)}
@@ -85,7 +94,7 @@ const UserForm = () => {
 				/>
 			</div>
 			<div className="flex gap-5 pt-2">
-				<Button onClick={onReset} type="reset">
+				<Button onClick={onReset} type="reset" outline>
 					Reset
 				</Button>
 				<Button type="submit">Create</Button>

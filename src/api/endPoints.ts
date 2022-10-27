@@ -15,7 +15,7 @@ const api = async <T>({ url, method, header, body }: RequestType<T>) => {
 			throw new Error(response.statusText);
 		}
 		return response.json() as Promise<T>;
-	}).catch(_ => undefined);
+	});
 };
 
 const UserApi = {

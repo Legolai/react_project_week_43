@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import User from "./@types/entities/user";
 import { UserApi } from "./api/endPoints";
 import "./App.css";
+import UserCard from "./components/UserCard";
 import UserForm from "./components/UserForm";
 
 function App() {
@@ -19,11 +20,11 @@ function App() {
 	return (
 		<>
 			<UserForm />
-			{users.map(user => {
-				return (
-					<p key={user.id}>{`${user.name} ${user.age} ${user.email} ${user.gender}`}</p>
-				);
-			})}
+			<div className="flex flex-col gap-5 mt-5">
+				{users.map(user => {
+					return <UserCard user={user} />;
+				})}
+			</div>
 		</>
 	);
 }
