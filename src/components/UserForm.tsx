@@ -4,7 +4,11 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { UserApi } from "../api/endPoints";
 import User, { emptyUser, isOfTypeGender } from "../@types/entities/user";
 
-const UserForm = () => {
+interface UserFormProps {
+	afterSubmit?: () => void;
+}
+
+const UserForm = ({ afterSubmit }: UserFormProps) => {
 	const [form, setForm] = useState<Omit<User, "id">>(emptyUser);
 
 	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -17,18 +21,21 @@ const UserForm = () => {
 	};
 
 	const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
+		e.preventDefault();
 		const user: User = {
 			id: crypto.randomUUID(),
 			...form,
 		};
 		const checkEmailDupes = await UserApi.findUserWith("email", user.email);
-		console.log(checkEmailDupes)
+		console.log(checkEmailDupes);
 		if (checkEmailDupes !== undefined && checkEmailDupes.length === 0) {
-			UserApi.create(user).then(_ => onReset());
+			const res = await UserApi.create(user);
+			if (res) {
+				onReset();
+				if (afterSubmit) afterSubmit();
+			}
 		} else {
 			alert("Email in use");
-			onReset();
 		}
 	};
 
@@ -90,7 +97,7 @@ const UserForm = () => {
 				/>
 			</div>
 			<div className="flex gap-5 pt-2">
-				<Button onClick={onReset} type="reset">
+				<Button onClick={onReset} outline type="reset">
 					Reset
 				</Button>
 				<Button type="submit">Create</Button>

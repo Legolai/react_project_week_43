@@ -6,31 +6,39 @@ import UserForm from "./components/UserForm";
 import GetUserWithNameForm from "./components/GetUserWithNameForm";
 import DeleteUserWithEmailForm from "./components/DeleteUserWithEmailForm";
 import UpdateUserWithEmail from "./components/UpdateUserWithEmail";
+import UserTable from "./components/UserTable";
+import FormChooser from "./components/FormChooser";
 
 function App() {
 	const [users, setUsers] = useState<User[]>([]);
+	const [refresh, setRefresh] = useState(false);
 
 	useEffect(() => {
-		const mount = async () => {
+		const getUsers = async () => {
 			const newUsers = await UserApi.findAll();
 			if (newUsers) setUsers(newUsers);
 		};
-		mount();
+		getUsers();
 		return () => {};
-	}, []);
+	}, [refresh]);
+
+	const refreshUsers = () => {
+		setRefresh(curr => !curr);
+	};
 
 	return (
 		<>
-			<UserForm />
-			<p>List of users from db: </p>
-			{users.map(user => {
-				return (
-					<p key={user.id}>{`${user.name} ${user.age} ${user.email} ${user.gender}`}</p>
-				);
-			})}
-			<GetUserWithNameForm />
-			<DeleteUserWithEmailForm />
-			<UpdateUserWithEmail />
+			<h1 className="text-3xl mb-2">List of users from db </h1>
+			<UserTable users={users} />
+
+			<FormChooser
+				forms={[
+					{ title: "Create", form: <UserForm afterSubmit={refreshUsers} /> },
+					{ title: "Get", form: <GetUserWithNameForm /> },
+					{ title: "Delete", form: <DeleteUserWithEmailForm /> },
+					{ title: "Update", form: <UpdateUserWithEmail /> },
+				]}
+			/>
 		</>
 	);
 }
